@@ -231,18 +231,13 @@ void HandleTCPClient(int clntSocket, sem_t *semController, libusb_device_handle 
                     int r = libusb_interrupt_transfer(h, readEndpointAddress, receive, sizeof(receive), &received, 0);
                     if (r == 0)
                     {
-                        if (!selfControllerMode(h))
-                        {
-                            no_quit = 0;
-                            selfControl =1;
-                        }
+                        no_quit = selfControllerMode(h);
                     }
                 }
             }
         }
         else
         {
-
             info_s("-----------MODE:", "USER CONTROL---------");
             if (isValidCommand(echoBuffer))
             {
