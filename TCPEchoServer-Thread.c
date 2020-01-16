@@ -36,23 +36,22 @@ static void * myThread (void * arg);            /* thread that does the work */
 //char semGoName[] = "semGo";
 //char shmName[]= "xpad_command";
 
-void printStatementOne();
-void printStatementTwo();
-void runParallel();
-void printValue();
 
-void close_shm(char* shm_addr,char * shm_name);
-static char *my_shm_create (char * shm_name, int size,char* value);
-static char *my_shm_open (char * shm_name);
+//void runParallel();
+//void printValue();
 
+//void close_shm(char* shm_addr,char * shm_name);
+//static char *my_shm_create (char * shm_name, int size,char* value);
+//static char *my_shm_open (char * shm_name);
 
+/*
 void runParallel(sem_t* semP){
     sem_wait(semP);
     //
     //Do something
     //
     sem_post(semP);    
-}
+}*/
 /*
 void close_shm(char* shm_addr,char * shm_name){
      int rtn; 
@@ -130,12 +129,11 @@ int main (int argc, char *argv[])
 {
     int         servSock;     /* Socket descriptor for server */
     int         clntSock;     /* Socket descriptor for client */
-    pthread_t   threadID;     /* Thread ID from pthread_create() */
     bool        to_quit = false;
     
     parse_args (argc, argv);
-    char*   shm_addr;
-    char*   shm_init ='0x000';
+    //char*   shm_addr;
+    //char*   shm_init ="0x00";
     struct arg_struct p_data;
 
     char semCName[] = "semController";
@@ -154,12 +152,12 @@ int main (int argc, char *argv[])
         p_data.semController = semController;
         p_data.h = h;
         // TODO: create&start the thread myThread() te creeeren
-        pthread_t thread;       
+        pthread_t   threadID ;    
         // use the POSIX operation pthread_create()
         //
         // make sure that clntSock and servSock are closed at the correct locations 
         // (in particular: at those places where you don't need them any more)
-        if (pthread_create (&thread, NULL,myThread, (void *)&p_data) != 0)
+        if (pthread_create (&threadID, NULL,myThread, (void *)&p_data) != 0)
         {
         perror ("pthread_create(a)");
         }
@@ -169,6 +167,7 @@ int main (int argc, char *argv[])
     }
     libusb_close(h);
     libusb_exit(NULL);
+    sem_unlink(semCName);
     close (servSock);
     info ("close");
     // server stops...
@@ -203,5 +202,6 @@ myThread (void * threadArgs)
     {
         perror ("pthread_detach(b)");
     }
+
     return (NULL);
 }

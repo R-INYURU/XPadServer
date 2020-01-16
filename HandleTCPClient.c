@@ -86,7 +86,7 @@ int receiveControlClient(libusb_device_handle *h, char *command)
     }
     else if (strcmp(command, "H") == 0)
     {
-        printf("Pressed the home button");
+        return 0;
     }
     else if (strcmp(command, "RL") == 0)
     {
@@ -217,13 +217,14 @@ void HandleTCPClient(int clntSocket, sem_t *semController, libusb_device_handle 
     /* Send received string and receive again until end of transmission */
     while (recvMsgSize > 0) /* zero indicates end of transmission */
     {
+        int selfControl;
         sem_wait(semController);
-        if (strcmp(echoBuffer, control_cond) == 0)
-        {
-            //printf("-------------SELF CONTROL MODE-----------------");
-
+        selfControl = strcmp(echoBuffer, control_cond);
+        if (selfControl == 0)
+        {         
             if (h != NULL)
             {
+                info_s("-----------MODE:", "SELF CONTROL---------");
                 while (no_quit)
                 {
                     int received;
@@ -232,7 +233,8 @@ void HandleTCPClient(int clntSocket, sem_t *semController, libusb_device_handle 
                     {
                         if (!selfControllerMode(h))
                         {
-                            break;
+                            no_quit = 0;
+                            selfControl =1;
                         }
                     }
                 }
@@ -240,7 +242,8 @@ void HandleTCPClient(int clntSocket, sem_t *semController, libusb_device_handle 
         }
         else
         {
-            printf("-------------USER CONTROL MODE-----------------");
+
+            info_s("-----------MODE:", "USER CONTROL---------");
             if (isValidCommand(echoBuffer))
             {
                 receiveControlClient(h, echoBuffer);
